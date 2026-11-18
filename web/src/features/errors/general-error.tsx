@@ -16,14 +16,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useNavigate, useRouter } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '@/components/ui/button'
+import {
+  BackHomeButton,
+  ErrorScreen,
+  GoBackButton,
+  RetryButton,
+} from '@/features/tokendazi/errors/error-screen'
 import { cn } from '@/lib/utils'
-
-const FEEDBACK_URL = 'https://github.com/QuantumNous/new-api/issues'
 
 type GeneralErrorProps = React.HTMLAttributes<HTMLDivElement> & {
   minimal?: boolean
@@ -45,7 +48,6 @@ export function GeneralError({
 }: GeneralErrorProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { history } = useRouter()
   useEffect(() => {
     if (
       !(error instanceof Error) ||
@@ -77,44 +79,63 @@ export function GeneralError({
     ? t('Please wait a moment before trying again.')
     : t('Please try again later.')
 
-  return (
-    <div className={cn('h-svh w-full', className)}>
-      <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
-        {!minimal && status !== undefined && (
-          <h1 className='text-[7rem] leading-tight font-bold'>{status}</h1>
+  // minimal 只用于内嵌在已有版式里的场合，直接给一句话，不铺整页骨架
+  if (minimal) {
+    return (
+      <div
+        className={cn(
+          'flex flex-col items-center justify-center gap-2 py-10 text-center',
+          className
         )}
+      >
         <span className='font-medium'>{title}</span>
-        <p className='text-muted-foreground text-center'>
-          {t('We apologize for the inconvenience.')} <br /> {description}
+        <p className='text-muted-foreground text-sm'>
+          {t('We apologize for the inconvenience.')} {description}
         </p>
-        {!minimal && (
-          <p className='text-muted-foreground text-center text-sm'>
-            {t('If this keeps happening, please report it on GitHub Issues.')}
-          </p>
-        )}
-        {!minimal && (
-          <div className='mt-6 flex flex-wrap justify-center gap-4'>
-            <Button variant='outline' onClick={() => history.go(-1)}>
-              {t('Go Back')}
-            </Button>
-            <Button
-              variant='outline'
-              render={
-                <a
-                  href={FEEDBACK_URL}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                />
-              }
-            >
-              {t('Report an issue')}
-            </Button>
-            <Button onClick={() => navigate({ to: '/' })}>
-              {t('Back to Home')}
-            </Button>
-          </div>
-        )}
       </div>
+    )
+  }
+
+  return (
+    <div className={className}>
+      <ErrorScreen
+        code={status === undefined ? 'ERR' : String(status)}
+        kicker={isRateLimited ? 'Rate Limited' : 'Server Error'}
+        title={title}
+        description={
+          <>
+            {t('We apologize for the inconvenience.')}
+            <br />
+            {description}
+          </>
+        }
+        stamp={
+          isRateLimited
+            ? { title: 'SLOW', lines: ['BACK OFF'], color: 'var(--tdz-yellow)' }
+            : { title: 'FAULT', lines: ['RETRY'], color: 'var(--tdz-orange)' }
+        }
+        barcodeSeed={`error-${status ?? 'unknown'}`}
+        actions={
+          <>
+            <RetryButton onClick={() => window.location.reload()} />
+            <BackHomeButton />
+            <GoBackButton />
+          </>
+        }
+        footnote={
+          <>
+            {t('Still stuck?')}{' '}
+            <button
+              type='button'
+              onClick={() => void navigate({ to: '/dashboard' })}
+              className='font-semibold text-[var(--tdz-emerald-strong)] underline decoration-dotted underline-offset-4'
+            >
+              {t('Open the console to check channel status')}
+            </button>
+            {t('or contact your administrator.')}
+          </>
+        }
+      />
     </div>
   )
 }

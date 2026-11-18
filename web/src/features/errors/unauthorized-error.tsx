@@ -16,33 +16,50 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useNavigate, useRouter } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '@/components/ui/button'
+import {
+  BackHomeButton,
+  ErrorScreen,
+  GoBackButton,
+} from '@/features/tokendazi/errors/error-screen'
 
 export function UnauthorisedError() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const { history } = useRouter()
+
   return (
-    <div className='h-svh'>
-      <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
-        <h1 className='text-[7rem] leading-tight font-bold'>401</h1>
-        <span className='font-medium'>{t('Unauthorized Access')}</span>
-        <p className='text-muted-foreground text-center'>
-          {t('Please log in with the appropriate credentials')} <br />{' '}
+    <ErrorScreen
+      code='401'
+      kicker='Unauthorized'
+      title={t('Unauthorized Access')}
+      description={
+        <>
+          {t('Please log in with the appropriate credentials')}
+          <br />
           {t('to access this resource.')}
-        </p>
-        <div className='mt-6 flex gap-4'>
-          <Button variant='outline' onClick={() => history.go(-1)}>
-            {t('Go Back')}
-          </Button>
-          <Button onClick={() => navigate({ to: '/' })}>
-            {t('Back to Home')}
-          </Button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+      stamp={{ title: 'LOCKED', lines: ['SIGN IN'], color: 'var(--tdz-blue)' }}
+      barcodeSeed='401-unauthorized'
+      actions={
+        <>
+          <BackHomeButton />
+          <GoBackButton />
+        </>
+      }
+      footnote={
+        <>
+          {t('Need to sign in first?')}{' '}
+          <Link
+            to='/sign-in'
+            className='font-semibold text-[var(--tdz-emerald-strong)] underline decoration-dotted underline-offset-4'
+          >
+            {t('Sign in')}
+          </Link>
+          {t('to continue.')}
+        </>
+      }
+    />
   )
 }
