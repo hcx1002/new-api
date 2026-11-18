@@ -1,0 +1,79 @@
+---
+/**
+ * 非中文语言的首页，由构建期静态生成。
+ *
+ * 每种语言输出独立的 HTML 文件（/en/index.html 等），
+ * 各自带 self-canonical 与全套 hreflang —— 这是静态站做多语言 SEO 的关键，
+ * 不能靠前端 i18n 切换语言，否则所有语言共用一个 URL，搜索引擎只能收一份。
+ */
+import LandingView from '@/components/LandingView.astro'
+import Base from '@/layouts/Base.astro'
+import {
+  BRAND_NAME,
+  LOCALES,
+  LOCALE_META,
+  SITE_URL,
+  type Locale,
+} from '@/config/site'
+import { getLandingCopy } from '@/lib/copy'
+
+export function getStaticPaths() {
+  return LOCALES.filter((code) => code !== 'zh').map((code) => ({
+    params: { locale: code },
+    props: { locale: code },
+  }))
+}
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const copy = getLandingCopy(locale)
+
+const pathByLocale = Object.fromEntries(
+  LOCALES.map((code) => [code, LOCALE_META[code].path])
+) as Record<string, string>
+
+const pageUrl = new URL(LOCALE_META[locale].path, SITE_URL).href
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: BRAND_NAME,
+      description: copy.description,
+      inLanguage: LOCALE_META[locale].htmlLang,
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: BRAND_NAME,
+      url: `${SITE_URL}/`,
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${pageUrl}#webpage`,
+      url: pageUrl,
+      name: copy.title,
+      description: copy.description,
+      isPartOf: { '@id': `${SITE_URL}/#website` },
+      inLanguage: LOCALE_META[locale].htmlLang,
+    },
+  ],
+}
+---
+
+<Base
+  locale={locale}
+  title={copy.title}
+  description={copy.description}
+  path={LOCALE_META[locale].path}
+  pathByLocale={pathByLocale}
+  jsonLd={jsonLd}
+>
+  <LandingView locale={locale} />
+</Base>

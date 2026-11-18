@@ -1,0 +1,62 @@
+---
+/**
+ * 中文首页（默认语言，走根路径）。
+ * 其余 6 种语言由 [locale]/index.astro 生成。
+ */
+import LandingView from '@/components/LandingView.astro'
+import Base from '@/layouts/Base.astro'
+import { LOCALES, LOCALE_META, SITE_URL, BRAND_NAME } from '@/config/site'
+import { getLandingCopy } from '@/lib/copy'
+import { assertSiteConfig } from '@/lib/seo'
+
+const locale = 'zh' as const
+const copy = getLandingCopy(locale)
+
+assertSiteConfig(SITE_URL, SITE_URL)
+
+const pathByLocale = Object.fromEntries(
+  LOCALES.map((code) => [code, LOCALE_META[code].path])
+) as Record<string, string>
+
+const pageUrl = new URL('/', SITE_URL).href
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: BRAND_NAME,
+      description: copy.description,
+      inLanguage: 'zh-CN',
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: BRAND_NAME,
+      url: `${SITE_URL}/`,
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${pageUrl}#webpage`,
+      url: pageUrl,
+      name: copy.title,
+      description: copy.description,
+      isPartOf: { '@id': `${SITE_URL}/#website` },
+      inLanguage: LOCALE_META[locale].htmlLang,
+    },
+  ],
+}
+---
+
+<Base
+  locale={locale}
+  title={copy.title}
+  description={copy.description}
+  path={LOCALE_META[locale].path}
+  pathByLocale={pathByLocale}
+  jsonLd={jsonLd}
+>
+  <LandingView locale={locale} />
+</Base>

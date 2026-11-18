@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# 错误页不参与索引
+Disallow: /404/
+Disallow: /*/404/
+
+Sitemap: https://token-api.example.com/sitemap-index.xml

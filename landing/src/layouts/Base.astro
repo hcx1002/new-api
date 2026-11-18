@@ -1,0 +1,108 @@
+---
+/**
+ * 全站 HTML 骨架。
+ *
+ * 所有 SEO 元信息都在这一个文件里生成：每个语言版本产出独立的静态 HTML，
+ * 各自带 self-canonical 与完整的 hreflang 互指，这样本站才是唯一被索引的入口。
+ */
+import '@/styles/global.css'
+
+import { BRAND_NAME, LOCALES, LOCALE_META, SITE_URL, type Locale } from '@/config/site'
+
+interface Props {
+  locale: Locale
+  title: string
+  description: string
+  /** 该页面在各语言下的路径，用于 hreflang 与 canonical */
+  pathByLocale: Record<Locale, string>
+  /** 当前页在站内的相对路径（不带域名），用于 canonical */
+  path: string
+  /** 结构化数据；不传则用默认的 WebSite + Organization */
+  jsonLd?: Record<string, unknown>
+  noindex?: boolean
+}
+
+const {
+  locale,
+  title,
+  description,
+  pathByLocale,
+  path,
+  jsonLd,
+  noindex = false,
+} = Astro.props
+
+const htmlLang = LOCALE_META[locale].htmlLang
+const canonical = new URL(path, SITE_URL).href
+
+const defaultJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: BRAND_NAME,
+      description,
+      inLanguage: LOCALES.map((code) => LOCALE_META[code].htmlLang),
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: BRAND_NAME,
+      url: `${SITE_URL}/`,
+    },
+  ],
+}
+---
+
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+
+    <title>{title}</title>
+    <meta name='description' content={description} />
+    <link rel='canonical' href={canonical} />
+
+    {/* 本站是被索引的唯一入口；主站自行 noindex，避免两套同源内容互相稀释 */}
+    {noindex && <meta name='robots' content='noindex, nofollow' />}
+    {!noindex && <meta name='robots' content='index, follow, max-image-preview:large' />}
+
+    {/* hreflang：每个语言版本都互指全部语言，并给出 x-default */}
+    {LOCALES.map((code) => (
+      <link
+        rel='alternate'
+        hreflang={LOCALE_META[code].htmlLang}
+        href={new URL(pathByLocale[code], SITE_URL).href}
+      />
+    ))}
+    <link rel='alternate' hreflang='x-default' href={new URL(pathByLocale.zh, SITE_URL).href} />
+
+    <meta property='og:type' content='website' />
+    <meta property='og:site_name' content={BRAND_NAME} />
+    <meta property='og:title' content={title} />
+    <meta property='og:description' content={description} />
+    <meta property='og:url' content={canonical} />
+    <meta property='og:locale' content={htmlLang.replace('-', '_')} />
+    {LOCALES.filter((code) => code !== locale).map((code) => (
+      <meta property='og:locale:alternate' content={LOCALE_META[code].htmlLang.replace('-', '_')} />
+    ))}
+
+    <meta name='twitter:card' content='summary_large_image' />
+    <meta name='twitter:title' content={title} />
+    <meta name='twitter:description' content={description} />
+
+    <meta name='theme-color' content='#f8f7f4' />
+    <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
+
+    <script
+      type='application/ld+json'
+      set:html={JSON.stringify(jsonLd ?? defaultJsonLd)}
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,16 @@
+---
+/**
+ * 中文 500（/500/）。
+ */
+import ErrorScreen from '@/components/ErrorScreen.astro'
+import { errorPath, errorPathByLocale, getErrorText } from '@/lib/errors'
+
+const locale = 'zh' as const
+---
+
+<ErrorScreen
+  locale={locale}
+  text={getErrorText(locale, '500')}
+  path={errorPath(locale, '500')}
+  pathByLocale={errorPathByLocale('500')}
+/>

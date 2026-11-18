@@ -1,0 +1,95 @@
+---
+/**
+ * 落地页正文。
+ *
+ * 抽成组件是因为 index.astro 与 [locale]/index.astro 都要渲染它：
+ * 前者出中文，后者按 getStaticPaths 出其余 6 种语言。
+ *
+ * island 策略（直接决定首屏 JS 体积，改动前请先读）：
+ *   client:load    → navbar、hero：首屏就要能点，必须立即水合
+ *   client:visible → code-showcase：滚到视口才加载，首屏不受累
+ *   无 client 指令 → bento / marquee / steps / cta / footer：纯 HTML，零 JS
+ */
+import { BentoSection } from '@/components/static/bento-section'
+import { CtaBanner, DarkSteps, SiteFooter } from '@/components/static/closing-sections'
+import { Marquee } from '@/components/static/marquee'
+import { EdgeRibbon } from '@/components/static/primitives'
+import { CodeShowcase } from '@/components/islands/code-showcase'
+import { Hero } from '@/components/islands/hero'
+import { Navbar } from '@/components/islands/navbar'
+import { BRAND_NAME, SITE_URL, mainSiteUrl, type Locale } from '@/config/site'
+import { MARQUEE_ITEMS } from '@/lib/data'
+import { getLandingCopy } from '@/lib/copy'
+import { loadMessages } from '@/lib/messages'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const copy = getLandingCopy(locale)
+const signUpUrl = mainSiteUrl('signUp')
+
+/*
+ * 翻译数据在构建期读出，作为 props 内联给 island。
+ * 这样客户端 chunk 里不含任何 locale JSON —— 否则 7 种语言会被
+ * Vite 打进同一个包（实测 156 KB），而每个页面其实只用一种。
+ */
+const messages = loadMessages(locale)
+---
+
+<div class='tdz-root min-h-screen bg-[var(--tdz-canvas)]'>
+  <EdgeRibbon />
+
+  <Navbar client:load brandName={BRAND_NAME} locale={locale} resources={messages} />
+
+  <Marquee items={MARQUEE_ITEMS} />
+
+  <main>
+    <Hero
+      client:load
+      brandName={BRAND_NAME}
+      baseUrl={copy.apiBaseUrl}
+      signUpUrl={signUpUrl}
+      locale={locale}
+      resources={messages}
+    />
+
+    <BentoSection />
+
+    <CodeShowcase
+      client:visible
+      brandName={BRAND_NAME}
+      baseUrl={copy.apiBaseUrl}
+      signUpUrl={signUpUrl}
+      locale={locale}
+      resources={messages}
+    />
+
+    <DarkSteps brandName={BRAND_NAME} />
+    <CtaBanner signUpUrl={signUpUrl} />
+  </main>
+
+  <SiteFooter brandName={BRAND_NAME} host={copy.host} />
+</div>
+
+<!-- 结构化数据由 Base.astro 统一注入；这里补一份 SoftwareApplication，
+     让搜索引擎能识别这是个可用的在线服务而不是纯介绍页 -->
+<script
+  type='application/ld+json'
+  set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: BRAND_NAME,
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web',
+    description: copy.description,
+    url: new URL('/', SITE_URL).href,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      description: 'Pay-as-you-go pricing',
+    },
+  })}
+/>

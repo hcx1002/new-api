@@ -1,0 +1,166 @@
+---
+/**
+ * 错误页外壳组件。
+ *
+ * 抽出来的原因：/404.astro、/[locale]/404.astro、/500.astro、/[locale]/500.astro
+ * 四处的结构完全一致，只有文案与状态码不同。用组件而不是页面互相 import，
+ * 是因为 Astro 页面之间 import 时 props 不会自动透传。
+ */
+import Base from '@/layouts/Base.astro'
+import {
+  Barcode,
+  BrandMark,
+  EdgeRibbon,
+  MonoTag,
+  Stamp,
+} from '@/components/static/primitives'
+import {
+  BRAND_NAME,
+  LOCALES,
+  LOCALE_META,
+  mainSiteUrl,
+  type Locale,
+} from '@/config/site'
+
+export interface ErrorText {
+  /** 大号状态码 */
+  code: string
+  /** 顶部标签，如 NOT FOUND / SERVER ERROR */
+  kicker: string
+  /** 主标题 */
+  title: string
+  /** 说明文字 */
+  description: string
+  /** 主按钮文案 */
+  primaryLabel: string
+  /** 主按钮链接 */
+  primaryHref: string
+  /** 次按钮文案（可选） */
+  secondaryLabel?: string
+  /** 次按钮链接（可选） */
+  secondaryHref?: string
+  /** 印章文字 */
+  stamp: { title: string; lines: string[]; color: string }
+  /** 条形码种子 */
+  barcodeSeed: string
+}
+
+interface Props {
+  locale: Locale
+  text: ErrorText
+  /** 该错误页在各语言下的路径，用于 hreflang */
+  pathByLocale: Record<string, string>
+  /** 当前语言下的本站路径 */
+  path: string
+}
+
+const { locale, text, pathByLocale, path } = Astro.props
+
+const homeUrl = LOCALE_META[locale].path
+---
+
+<Base
+  locale={locale}
+  title={`${text.code} · ${text.title} · ${BRAND_NAME}`}
+  description={text.description}
+  path={path}
+  pathByLocale={pathByLocale}
+  noindex={true}
+>
+  <div class='tdz-root relative flex min-h-svh flex-col overflow-hidden bg-[var(--tdz-canvas)]'>
+    <EdgeRibbon />
+
+    <header
+      class='mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 pt-6'
+    >
+      <a href={homeUrl} aria-label={BRAND_NAME}>
+        <BrandMark name={BRAND_NAME} compact />
+      </a>
+      <span
+        class='tdz-mono hidden items-center gap-2 text-[10px] font-bold tracking-[0.1em] text-[var(--tdz-muted)] uppercase sm:flex'
+      >
+        <span
+          class='tdz-pulse h-1.5 w-1.5 rounded-full bg-[var(--tdz-orange)]'
+        ></span>
+        {text.kicker}
+      </span>
+    </header>
+
+    <main class='mx-auto flex w-full max-w-6xl flex-1 items-center px-6 py-12'>
+      <div class='relative w-full'>
+        <span
+          class='tdz-notch top-[-11px] left-[calc(16.6667%_-_11px)] z-20 hidden lg:block'
+        ></span>
+        <span
+          class='tdz-notch bottom-[-11px] left-[calc(16.6667%_-_11px)] z-20 hidden lg:block'
+        ></span>
+
+        <div
+          class='grid grid-cols-1 overflow-hidden rounded-3xl border-2 border-[color:var(--tdz-ink)] bg-white shadow-[12px_12px_0px_0px_var(--tdz-shadow)] lg:grid-cols-12'
+        >
+          <div
+            class='relative flex flex-col justify-between gap-8 border-b-2 border-dashed border-[color:var(--tdz-ink)]/20 bg-[var(--tdz-canvas)]/70 p-8 lg:col-span-5 lg:border-r-2 lg:border-b-0 lg:p-10'
+          >
+            <div>
+              <MonoTag tone='orange'>{text.kicker}</MonoTag>
+              <h2
+                class='tdz-mono mt-5 text-[clamp(3.4rem,9vw,5.4rem)] leading-none font-extrabold tracking-tighter text-[var(--tdz-ink)]'
+              >
+                {text.code}
+              </h2>
+              <div class='mt-4 flex items-center gap-3'>
+                <Barcode seed={text.barcodeSeed} thickness={30} length={150} />
+                <span
+                  class='tdz-mono text-[9px] leading-tight tracking-[0.14em] text-[var(--tdz-muted)] uppercase'
+                >
+                  err<br />ref
+                </span>
+              </div>
+            </div>
+            <div class='flex justify-start lg:justify-end'>
+              <Stamp
+                title={text.stamp.title}
+                lines={text.stamp.lines}
+                color={text.stamp.color}
+                size={104}
+                animate={true}
+              />
+            </div>
+          </div>
+
+          <div class='flex flex-col justify-center p-8 lg:col-span-7 lg:p-12'>
+            <h1
+              class='text-[26px] leading-tight font-extrabold tracking-tight text-[var(--tdz-ink)] lg:text-[32px]'
+            >
+              {text.title}
+            </h1>
+            <p
+              class='mt-3 max-w-lg text-[14px] leading-relaxed text-[var(--tdz-body)]'
+            >
+              {text.description}
+            </p>
+
+            <div class='mt-7 flex flex-wrap items-center gap-3'>
+              <a
+                href={text.primaryHref}
+                class='inline-flex h-11 items-center gap-2 rounded-full bg-[var(--tdz-ink)] px-5 text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--tdz-ink-soft)]'
+              >
+                {text.primaryLabel}
+              </a>
+              {
+                text.secondaryHref && text.secondaryLabel && (
+                  <a
+                    href={text.secondaryHref}
+                    class='inline-flex h-11 items-center gap-2 rounded-full border-2 border-[color:var(--tdz-ink)] bg-white px-5 text-[13.5px] font-bold text-[var(--tdz-ink)] transition-all hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_var(--tdz-shadow)]'
+                  >
+                    {text.secondaryLabel}
+                  </a>
+                )
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</Base>

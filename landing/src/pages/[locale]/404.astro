@@ -1,0 +1,28 @@
+---
+/**
+ * 非中文 404（/en/404/ 等），构建期静态生成。
+ */
+import ErrorScreen from '@/components/ErrorScreen.astro'
+import { LOCALES, type Locale } from '@/config/site'
+import { errorPath, errorPathByLocale, getErrorText } from '@/lib/errors'
+
+export function getStaticPaths() {
+  return LOCALES.filter((code) => code !== 'zh').map((code) => ({
+    params: { locale: code },
+    props: { locale: code },
+  }))
+}
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+---
+
+<ErrorScreen
+  locale={locale}
+  text={getErrorText(locale, '404')}
+  path={errorPath(locale, '404')}
+  pathByLocale={errorPathByLocale('404')}
+/>
