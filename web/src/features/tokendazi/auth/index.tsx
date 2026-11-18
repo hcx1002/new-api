@@ -198,28 +198,6 @@ function OAuthBlock({ status }: { status: SystemStatus | null }) {
   )
 }
 
-function resolveTurnstileHint(
-  state: {
-    failed: boolean
-    verified: boolean
-    bypass: boolean
-    slow: boolean
-  },
-  t: (key: string) => string
-): { tone: 'muted' | 'warn'; text: string } {
-  if (state.failed) {
-    return { tone: 'warn', text: t('mk.auth.turnstile.failed') }
-  }
-  if (state.verified) return { tone: 'muted', text: t('mk.auth.turnstile.verified') }
-  if (state.bypass) {
-    return { tone: 'muted', text: t('mk.auth.turnstile.bypass') }
-  }
-  if (state.slow) {
-    return { tone: 'warn', text: t('mk.auth.turnstile.slow') }
-  }
-  return { tone: 'muted', text: t('mk.auth.turnstile.pending') }
-}
-
 /** 后端部分错误是英文原文，人机验证相关给出可操作的本站提示 */
 function localizeAuthError(
   message: string,
@@ -345,8 +323,8 @@ export function AuthPage({
   const [success, setSuccess] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
   const [turnstileKey, setTurnstileKey] = useState(0)
-  const [turnstileFailed, setTurnstileFailed] = useState(false)
   const [turnstileSlow, setTurnstileSlow] = useState(false)
+  const [turnstileFailed, setTurnstileFailed] = useState(false)
 
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -387,15 +365,6 @@ export function AuthPage({
   const turnstileBypass = Boolean(
     import.meta.env.DEV && isTurnstileEnabled && turnstileSlow && !turnstileToken
   )
-  const turnstileHint = resolveTurnstileHint(
-    {
-      failed: turnstileFailed,
-      verified: Boolean(turnstileToken),
-      bypass: turnstileBypass,
-      slow: turnstileSlow,
-    },
-    t
-  )
 
   useEffect(
     () => () => {
@@ -404,13 +373,20 @@ export function AuthPage({
     []
   )
 
-  // ?aff=xxx 推广链接落地时先存下来，注册时自动带上
+  // ?aff=xxx 推广链接落地时先存下来，注册时自动带上；
+  // 同时回填到输入框并展开邀请码区域，否则用户看不到实际生效的是哪个邀请码
   useEffect(() => {
+    if (mode !== 'register') return
     const aff = new URLSearchParams(window.location.search).get('aff')?.trim()
     if (aff) saveAffiliateCode(aff)
-  }, [])
+    // 地址栏没有 aff 时，沿用之前落地页存下的推广码，保证界面与提交值一致
+    const effective = aff || getAffiliateCode()
+    if (!effective) return
+    setInviteCode(effective)
+    setInviteOpen(true)
+  }, [mode])
 
-  // Turnstile 脚本被拦截时不会有人机验证框，给个明确提示而不是静默空白
+  // Turnstile 脚本被拦截时不会渲染出验证框，静默空白会让人无从下手
   useEffect(() => {
     if (!isTurnstileEnabled) return
     setTurnstileFailed(false)
@@ -429,12 +405,6 @@ export function AuthPage({
     const timer = setTimeout(() => setTurnstileSlow(true), 8000)
     return () => clearTimeout(timer)
   }, [isTurnstileEnabled, turnstileKey, turnstileToken])
-
-  const reloadTurnstile = () => {
-    setTurnstileToken('')
-    setErrors((prev) => ({ ...prev, turnstile: undefined }))
-    setTurnstileKey((value) => value + 1)
-  }
 
   const passwordEncryptionEnabled =
     status?.password_login_encryption_enabled === true
@@ -579,7 +549,8 @@ export function AuthPage({
         password,
         email: account,
         verification_code: emailVerificationEnabled ? code.trim() : undefined,
-        aff_code: inviteCode.trim() || getAffiliateCode() || undefined,
+        // 邀请码已在进入页面时回填，这里以用户看到的输入框为准，清空即代表不使用
+        aff_code: inviteCode.trim() || undefined,
         turnstile: turnstileToken,
       })
 
@@ -994,43 +965,25 @@ export function AuthPage({
                     )}
 
                     {isTurnstileEnabled && (
-                      <div className='mt-4 rounded-xl border border-[color:var(--tdz-line)] bg-[var(--tdz-canvas)] p-2.5'>
-                        <div className='mb-1.5 flex items-center justify-between gap-2'>
-                          <span className='tdz-mono text-[9.5px] font-bold tracking-[0.12em] text-[var(--tdz-muted)] uppercase'>
-                            {t('mk.auth.turnstile.section')}
-                          </span>
-                          <button
-                            type='button'
-                            onClick={reloadTurnstile}
-                            className='tdz-mono text-[9.5px] font-bold text-[var(--tdz-emerald-strong)] hover:underline'
-                          >
-                            {t('mk.auth.turnstile.reload')}
-                          </button>
-                        </div>
-                        <div className='min-h-[65px]'>
-                          <Turnstile
-                            key={turnstileKey}
-                            siteKey={turnstileSiteKey}
-                            onVerify={(token) => {
-                              setTurnstileToken(token)
-                              setErrors((prev) => ({
-                                ...prev,
-                                turnstile: undefined,
-                              }))
-                            }}
-                            onExpire={() => setTurnstileToken('')}
-                          />
-                        </div>
-                        <p
-                          className={cn(
-                            'mt-1',
-                            turnstileHint.tone === 'warn'
-                              ? 'text-[10.5px] leading-relaxed text-[var(--tdz-orange)]'
-                              : 'tdz-mono text-[9.5px] tracking-[0.08em] text-[var(--tdz-muted)] uppercase'
-                          )}
-                        >
-                          {turnstileHint.text}
-                        </p>
+                      <div className='mt-4'>
+                        <Turnstile
+                          key={turnstileKey}
+                          siteKey={turnstileSiteKey}
+                          onVerify={(token) => {
+                            setTurnstileToken(token)
+                            setErrors((prev) => ({
+                              ...prev,
+                              turnstile: undefined,
+                            }))
+                          }}
+                          onExpire={() => setTurnstileToken('')}
+                        />
+                        {/* 脚本被拦截时组件不渲染，用一行内联提示兜底，不额外加卡片 */}
+                        {turnstileFailed && (
+                          <p className='mt-1.5 text-[11px] leading-relaxed text-[var(--tdz-orange)]'>
+                            {t('mk.auth.turnstile.failed')}
+                          </p>
+                        )}
                         <FieldError message={errors.turnstile} />
                       </div>
                     )}

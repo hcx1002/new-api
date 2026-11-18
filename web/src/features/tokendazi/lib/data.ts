@@ -16,7 +16,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-
 import type { TFunction } from 'i18next'
 
 /** 首页与登录页共用的产品数据与文案，模型信息以当前网关实际在售模型为准。

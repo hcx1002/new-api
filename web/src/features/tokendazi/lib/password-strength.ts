@@ -16,7 +16,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-
 /** 四色密码强度：橙 → 黄 → 蓝 → 绿。`label` 存 i18n key，渲染处用 t() 取值 */
 export const STRENGTH_STEPS = [
   { label: 'mk.strength.weak', color: 'var(--tdz-orange)' },

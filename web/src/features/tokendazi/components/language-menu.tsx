@@ -39,9 +39,6 @@ export function LanguageMenu({ className }: { className?: string }) {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
   const current = normalizeInterfaceLanguage(i18n.language)
-  const currentLabel =
-    INTERFACE_LANGUAGE_OPTIONS.find((lang) => lang.code === current)?.label ??
-    'English'
 
   const changeLanguage = async (code: string) => {
     setOpen(false)
@@ -82,7 +79,6 @@ export function LanguageMenu({ className }: { className?: string }) {
         className='flex h-9 items-center gap-1.5 rounded-xl border border-[color:var(--tdz-ink)]/20 bg-white px-2.5 text-[12.5px] font-medium text-[var(--tdz-ink)] transition-colors hover:border-[color:var(--tdz-ink)]'
       >
         <Languages className='h-4 w-4' />
-        {/* <span className='hidden md:inline'>{currentLabel}</span> */}
       </button>
 
       {open && (
