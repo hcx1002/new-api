@@ -127,11 +127,13 @@ export function ThemeCustomizationProvider(props: {
 
   // Mirror state to the <body> via data-* attributes so theme-presets.css can
   // override CSS variables at the right cascade layer.
+  //
+  // 这里不能像 radius/scale 那样「等于默认值就写 null」：
+  // 默认预设一旦不是 `default`（现在是 tokendazi），省略该属性会让样式
+  // 回落到 :root 的蓝色基础令牌，默认主题就完全不生效了。
+  // 所以预设值必须始终写到 DOM 上，由 CSS 自己决定覆盖哪些令牌。
   useEffect(() => {
-    applyAttribute(
-      'data-theme-preset',
-      preset === DEFAULT_THEME_CUSTOMIZATION.preset ? null : preset
-    )
+    applyAttribute('data-theme-preset', preset)
   }, [preset])
 
   // Resolve Auto into the preset font or the browser's sans-serif while
@@ -162,7 +164,9 @@ export function ThemeCustomizationProvider(props: {
     _setPreset(value)
     writeThemePreference(
       THEME_STORAGE_KEYS.preset,
-      value === DEFAULT_THEME_CUSTOMIZATION.preset ? null : value
+      // 与上面的 DOM 写入保持一致：预设永远落盘，避免「显式选了默认预设」
+      // 和「从未选择过」在存储层无法区分，导致刷新后悄悄跳到别的主题。
+      value
     )
   }, [])
 

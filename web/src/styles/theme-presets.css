@@ -426,10 +426,16 @@ For commercial licensing, please contact support@quantumnous.com
  *   - `anthropic`: warm cream surfaces are a brand choice, NOT a primary-mix
  *     derivation (the Anthropic system deliberately uses warm neutrals for
  *     cards/borders rather than tinting them with the clay accent).
- *   - `simple-large`: keeps intentionally neutral, high-contrast surfaces. */
+ *   - `simple-large`: keeps intentionally neutral, high-contrast surfaces.
+ *   - `tokendazi`: the marketing site pairs a warm paper canvas with *pure
+ *     white* cards so they lift off the tinted background. Tinting the card
+ *     with the emerald accent (what the bridge would do) collapses that
+ *     canvas/card distinction and makes every surface look mint-washed. */
 [data-theme-preset]:not([data-theme-preset='default']):not(
   [data-theme-preset='anthropic']
-):not([data-theme-preset='simple-large']) {
+):not([data-theme-preset='simple-large']):not(
+  [data-theme-preset='tokendazi']
+) {
   --card: color-mix(in oklch, var(--primary) 3%, var(--background));
   --popover: color-mix(in oklch, var(--primary) 5%, var(--background));
   --muted: color-mix(in oklch, var(--primary) 7%, var(--background));
@@ -454,7 +460,9 @@ For commercial licensing, please contact support@quantumnous.com
 .dark
   [data-theme-preset]:not([data-theme-preset='default']):not(
     [data-theme-preset='anthropic']
-  ):not([data-theme-preset='simple-large']) {
+  ):not([data-theme-preset='simple-large']):not(
+    [data-theme-preset='tokendazi']
+  ) {
   --card: color-mix(in oklch, var(--primary) 8%, var(--background));
   --popover: color-mix(in oklch, var(--primary) 12%, var(--background));
   --muted: color-mix(in oklch, var(--primary) 12%, var(--background));
@@ -610,6 +618,218 @@ For commercial licensing, please contact support@quantumnous.com
 
   --skeleton-base: oklch(0.305 0.004 60);
   --skeleton-highlight: oklch(0.41 0.004 60);
+}
+
+/* ── Token API ───────────────────────────────────────────────────────────
+ * 对应营销站（landing/）的 Lite Neo-Brutalism：暖纸画布 + 近黑墨线 + 单一祖母绿。
+ *
+ * 这个预设的核心不是"换个绿色"，而是**边界可见**。
+ * 上游默认的边框对比度只有约 1.2:1（几乎看不见），大面积表格和卡片
+ * 会糊成一片；营销站的辨识度恰恰来自清晰的墨线边界。
+ * 因此这里刻意把 border/input 压到接近墨色（对比度约 10:1），
+ * 让卡片、表格、输入框都有明确轮廓，而不是靠阴影去"猜"边界。
+ *
+ * 画布保留极轻的暖调（#f7f6f3）而非纯白：纯白 + 深墨线会显得刺眼，
+ * 暖纸底能让墨线柔和一点，同时卡片仍用纯白，靠明度差浮起来。
+ *
+ * radius 用 0.75rem：营销站是圆角 + 药丸按钮，比上游 1rem 在密集表格上更耐看。
+ */
+[data-theme-preset='tokendazi'] {
+  /* 画布与墨色。 */
+  --background: oklch(0.972 0.004 92); /* #f7f6f3 暖纸 */
+  --foreground: oklch(0.186 0.007 258); /* #111316 墨 */
+
+  /* 卡片用纯白，与暖纸底拉开层次。 */
+  --card: oklch(1 0 0); /* #ffffff */
+  --card-foreground: oklch(0.186 0.007 258);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.186 0.007 258);
+
+  /* 祖母绿作为唯一强调色。 */
+  --primary: oklch(0.6959 0.1491 162.48); /* #10b981 */
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.949 0.022 164); /* 比画布略深一档的薄荷 */
+  --secondary-foreground: oklch(0.596 0.1274 163.23); /* #059669 */
+
+  --muted: oklch(0.949 0.022 164);
+  --muted-foreground: oklch(0.47 0.016 260); /* #565b64 已加深，达 WCAG AA */
+  --accent: oklch(0.945 0.024 164);
+  --accent-foreground: oklch(0.186 0.007 258);
+
+  /* 语义色沿用营销站的四色。 */
+  --destructive: oklch(0.7049 0.1867 47.6); /* #f97316 */
+  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.596 0.1274 163.23); /* #059669 */
+  --success-foreground: oklch(1 0 0);
+  --warning: oklch(0.8606 0.1731 91.94); /* #facc15 */
+  --warning-foreground: oklch(0.455 0.11 66); /* 深琥珀，保证黄底可读 */
+  --info: oklch(0.6231 0.188 259.81); /* #3b82f6 */
+  --info-foreground: oklch(1 0 0);
+  --neutral: oklch(0.47 0.016 260);
+  --neutral-foreground: oklch(1 0 0);
+
+  /* ★ 关键：墨线边框。对比度约 10.8:1，边界清晰可见。
+   * input 再深一档，让表单控件比静态分区更"实"。 */
+  --border: oklch(0.36 0.014 258); /* #3a3e44 */
+  --input: oklch(0.30 0.015 258); /* #2e3238 */
+  --ring: oklch(0.6959 0.1491 162.48);
+
+  /* 图表走品牌四色（绿/蓝/黄/橙 + 深绿）。 */
+  --chart-1: oklch(0.6959 0.1491 162.48);
+  --chart-2: oklch(0.6231 0.188 259.81);
+  --chart-3: oklch(0.8606 0.1731 91.94);
+  --chart-4: oklch(0.7049 0.1867 47.6);
+  --chart-5: oklch(0.596 0.1274 163.23);
+
+  /* 侧边栏与画布同色：视觉重心交给每个菜单项自己的描边，
+   * 侧边栏本身不做分区（那会让界面多一层"框套框"的噪音）。 */
+  --sidebar: oklch(0.972 0.004 92); /* 与 --background 一致 */
+  --sidebar-foreground: oklch(0.186 0.007 258);
+  --sidebar-primary: oklch(0.6959 0.1491 162.48);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.912 0.03 164); /* 选中/悬停：薄荷底 + 绿字 */
+  --sidebar-accent-foreground: oklch(0.52 0.12 163);
+  --sidebar-border: oklch(0.36 0.014 258); /* ★ 墨线分界 */
+  --sidebar-ring: oklch(0.6959 0.1491 162.48);
+
+  --skeleton-base: oklch(0.938 0.008 92);
+  --skeleton-highlight: oklch(0.965 0.005 92);
+
+  --radius: 0.75rem;
+}
+
+.dark [data-theme-preset='tokendazi'] {
+  /* 深色下营销站用的是带绿调的近黑（#0f1412 / #191d21），
+   * 不是中性炭灰。边框反向处理：深色底上的墨线看不见，
+   * 所以改成高亮描边，同样保证边界锐利。 */
+  --background: oklch(0.2283 0.0098 248.26); /* #191d21 */
+  --foreground: oklch(0.9605 0.0025 106.42);
+  --card: oklch(0.2645 0.0108 248.26);
+  --card-foreground: oklch(0.9605 0.0025 106.42);
+  --popover: oklch(0.2815 0.0112 248.26);
+  --popover-foreground: oklch(0.9605 0.0025 106.42);
+
+  --primary: oklch(0.758 0.1526 162.48);
+  --primary-foreground: oklch(0.1851 0.0088 169.2);
+
+  --secondary: oklch(0.3215 0.0118 248.26);
+  --secondary-foreground: oklch(0.9005 0.0435 164.59);
+
+  --muted: oklch(0.2945 0.011 248.26);
+  --muted-foreground: oklch(0.815 0.012 260); /* 深色底上提亮，保证可读 */
+  --accent: oklch(0.345 0.013 248.26);
+  --accent-foreground: oklch(0.9605 0.0025 106.42);
+
+  --destructive: oklch(0.7459 0.1707 47.6);
+  --destructive-foreground: oklch(0.1851 0.0088 169.2);
+  --success: oklch(0.758 0.1526 162.48);
+  --success-foreground: oklch(0.1851 0.0088 169.2);
+  --warning: oklch(0.8806 0.1631 91.94);
+  --warning-foreground: oklch(0.1851 0.0088 169.2);
+  --info: oklch(0.6931 0.168 259.81);
+  --info-foreground: oklch(0.1851 0.0088 169.2);
+  --neutral: oklch(0.721 0.0191 264.36);
+  --neutral-foreground: oklch(0.1851 0.0088 169.2);
+
+  /* ★ 深色下的"墨线"= 高亮描边。用 34% 白而不是 10%，
+   * 上游的 10% 在深底上同样会糊掉。 */
+  --border: oklch(1 0 0 / 34%);
+  --input: oklch(1 0 0 / 28%);
+  --ring: oklch(0.758 0.1526 162.48);
+
+  --chart-1: oklch(0.758 0.1526 162.48);
+  --chart-2: oklch(0.6931 0.168 259.81);
+  --chart-3: oklch(0.8806 0.1631 91.94);
+  --chart-4: oklch(0.7459 0.1707 47.6);
+  --chart-5: oklch(0.672 0.1274 163.23);
+
+  /* 深色下侧边栏同样与背景同色，靠菜单项描边区分。 */
+  --sidebar: oklch(0.2283 0.0098 248.26);
+  --sidebar-foreground: oklch(0.9405 0.0045 106.42);
+  --sidebar-primary: oklch(0.758 0.1526 162.48);
+  --sidebar-primary-foreground: oklch(0.1851 0.0088 169.2);
+  --sidebar-accent: oklch(0.335 0.014 248.26);
+  --sidebar-accent-foreground: oklch(0.88 0.10 163);
+  --sidebar-border: oklch(1 0 0 / 28%); /* ★ 深底上的描边 */
+  --sidebar-ring: oklch(0.758 0.1526 162.48);
+
+  --skeleton-base: oklch(0.3215 0.0118 248.26);
+  --skeleton-highlight: oklch(0.4115 0.0142 248.26);
+}
+
+/* ── Token API: 边界增强 ────────────────────────────────────────────────
+ * 上面只改了设计令牌，但「看不清」还有第二个来源：
+ * Card / Dialog / Dropdown 等容器用的是硬编码的 `ring-foreground/10`
+ * （前景色 10% 透明度），这个值不读 --border，所以调令牌管不到它们。
+ * 结果就是卡片在画布上几乎没有轮廓。
+ *
+ * 这里只对 tokendazi 预设提升这些容器的描边强度，用 --border 的实际颜色
+ * 替换 10% 淡化版。用属性选择器限定预设，其余 9 个预设完全不受影响。
+ * 用 ring 而非 border 覆盖，是为了不改动组件的盒模型（不会让布局位移）。
+ */
+[data-theme-preset='tokendazi'] {
+  /* 主容器：卡片、对话框、弹出层统一用实色描边 */
+  & [data-slot='card'],
+  & [data-slot='dialog-content'],
+  & [data-slot='alert-dialog-content'],
+  & [data-slot='dropdown-menu-content'],
+  & [data-slot='popover-content'],
+  & [data-slot='hover-card-content'],
+  & [data-slot='combobox-content'],
+  & [data-slot='select-content'] {
+    --tw-ring-color: var(--border);
+  }
+}
+
+/* ── Token API: 菜单项描边 ──────────────────────────────────────────────
+ * 侧边栏本身与画布同色、不分框，视觉边界交给每个菜单项自己：
+ * 每一项带一圈清晰的描边，选中项再加厚加绿。
+ *
+ * 这是首页"卡片 + 硬边"的做法迁移到导航上 —— 上游默认只有
+ * 1.2:1 的浅描边（几乎不可见）和纯底色差的悬停态，
+ * 菜单项在密集列表里会糊成一片，用户只能靠文字位置去辨认。
+ *
+ * 用 box-shadow 而不是 border 画描边：不改盒模型，
+ * 不会让菜单项因为加了 1px 边框而整体位移、也不影响折叠动画的宽度计算。
+ */
+[data-theme-preset='tokendazi'] {
+  & [data-slot='sidebar-menu-button'] {
+    /* 常态：一圈淡墨线，让每一项都是一个可点击的独立单元 */
+    box-shadow: inset 0 0 0 1px
+      color-mix(in oklch, var(--border) 26%, transparent);
+    transition:
+      box-shadow 150ms ease,
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  /* 悬停：描边加深，底色转薄荷 */
+  & [data-slot='sidebar-menu-button']:hover {
+    background-color: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in oklch, var(--border) 48%, transparent);
+  }
+
+  /* 选中：墨线 + 薄荷底，与首页的强调方式一致 */
+  & [data-slot='sidebar-menu-button'][data-active] {
+    background-color: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1.5px
+      color-mix(in oklch, var(--primary) 55%, var(--border));
+  }
+
+  /* 子菜单项（层级更浅）只保留悬停反馈，不加常态描边，
+   * 否则一整列全是框，反而看不清父子关系。 */
+  & [data-slot='sidebar-menu-sub-button'] {
+    box-shadow: none;
+  }
+  & [data-slot='sidebar-menu-sub-button']:hover {
+    background-color: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+  }
 }
 
 /* ── Font axis ────────────────────────────────────────────────────────────

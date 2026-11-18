@@ -30,6 +30,14 @@ export const THEME_PRESETS = [
     swatches: ['oklch(0.72 0.18 250)', 'oklch(0.7 0.12 280)'],
   },
   {
+    // The marketing site's brand palette: warm paper canvas (#f8f7f4) and
+    // near-black ink (#111316), with emerald (#10b981) as the single accent.
+    // Swatches preview that canvas → accent pairing.
+    value: 'tokendazi',
+    name: 'Token API',
+    swatches: ['oklch(0.9761 0.0041 91.45)', 'oklch(0.6959 0.1491 162.48)'],
+  },
+  {
     // Inspired by Anthropic's official brand language: warm cream canvas
     // (#faf9f5) paired with clay/coral (#d97757) as the single accent.
     // Swatches preview the canvas → accent gradient that defines the system.
@@ -111,9 +119,17 @@ export type ThemeCustomization = {
   contentLayout: ContentLayout
 }
 
+/**
+ * 首次访问的初始主题，同时也是设置面板「重置」的目标值。
+ *
+ * preset 用 tokendazi、font 用 sans，与营销站保持同一套视觉：
+ * 暖白纸感画布 + 近黑墨色 + 祖母绿单一强调色，正文字体明确落到 Public Sans。
+ * 这样首页、登录页、控制台三处读起来是同一个产品，
+ * 而不是「落地页一套、控制台另一套」。
+ */
 export const DEFAULT_THEME_CUSTOMIZATION: ThemeCustomization = {
-  preset: 'default',
-  font: 'default',
+  preset: 'tokendazi',
+  font: 'sans',
   radius: 'default',
   scale: 'default',
   contentLayout: 'full',

@@ -14,6 +14,10 @@
     />
 
     <meta name="theme-color" content="#fff" />
+    <!-- 主站不参与搜索引擎索引：对外曝光由独立的静态落地站承担，
+         两套同源内容同时开放索引会互相稀释权重。
+         落地站见仓库根目录 landing/。 -->
+    <meta name="robots" content="noindex, nofollow" />
     <!-- Resolve the theme before first paint so the page never flashes light
          and one-shot detectors (e.g. Dark Reader) see the real theme.
          Keep in sync with ThemeProvider and THEME_STORAGE_KEYS.mode. -->

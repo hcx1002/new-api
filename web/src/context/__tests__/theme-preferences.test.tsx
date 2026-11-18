@@ -26,6 +26,25 @@ import {
 } from '@/context/theme-customization-provider'
 import { ThemeProvider, useTheme } from '@/context/theme-provider'
 import { initializeFrontendCache } from '@/lib/frontend-cache'
+import {
+  DEFAULT_THEME_CUSTOMIZATION,
+  resolveThemeFont,
+} from '@/lib/theme-customization'
+
+/**
+ * 「回到默认」时 data-theme-preset 的值。
+ *
+ * 默认预设不一定叫 `default`（当前是 tokendazi），而且 provider 现在
+ * 始终把预设写到 DOM 上 —— 省略该属性会让样式回落到 :root 的蓝色基础
+ * 令牌，默认主题就失效了。所以断言取配置里的真实默认值。
+ */
+const DEFAULT_PRESET = DEFAULT_THEME_CUSTOMIZATION.preset
+
+/** 默认字体。改成 sans 后 DOM 上直接是 `sans`，不再回落到 `system`。 */
+const DEFAULT_FONT = resolveThemeFont(
+  DEFAULT_THEME_CUSTOMIZATION.font,
+  DEFAULT_THEME_CUSTOMIZATION.preset
+)
 
 const savedPreferences = {
   'newapi:theme:v1:mode': 'dark',
@@ -125,8 +144,8 @@ describe('theme preference persistence', () => {
 
     expect(screen.getByLabelText('Theme mode')).toHaveTextContent('system')
     expect(document.documentElement).toHaveClass('light')
-    expect(document.body).not.toHaveAttribute('data-theme-preset')
-    expect(document.body).toHaveAttribute('data-theme-font', 'system')
+    expect(document.body).toHaveAttribute('data-theme-preset', DEFAULT_PRESET)
+    expect(document.body).toHaveAttribute('data-theme-font', DEFAULT_FONT)
     expect(document.body).not.toHaveAttribute('data-theme-radius')
     expect(document.body).not.toHaveAttribute('data-theme-scale')
     expect(document.body).toHaveAttribute('data-theme-content-layout', 'full')
@@ -171,12 +190,18 @@ describe('theme preference persistence', () => {
 
     expect(screen.getByLabelText('Theme mode')).toHaveTextContent('system')
     expect(document.documentElement).toHaveClass('light')
-    expect(document.body).not.toHaveAttribute('data-theme-preset')
-    expect(document.body).toHaveAttribute('data-theme-font', 'system')
+    expect(document.body).toHaveAttribute('data-theme-preset', DEFAULT_PRESET)
+    expect(document.body).toHaveAttribute('data-theme-font', DEFAULT_FONT)
     expect(document.body).not.toHaveAttribute('data-theme-radius')
     expect(document.body).not.toHaveAttribute('data-theme-scale')
     expect(document.body).toHaveAttribute('data-theme-content-layout', 'full')
     for (const key of Object.keys(savedPreferences)) {
+      // preset 永远不会被清空：默认预设不叫 `default` 时必须显式落盘，
+      // 否则刷新后会悄悄跳回 :root 的基础配色。其余维度仍按「等于默认即清空」处理。
+      if (key === 'newapi:theme:v1:preset') {
+        expect(localStorage.getItem(key)).toBe(DEFAULT_PRESET)
+        continue
+      }
       expect(localStorage.getItem(key)).toBeNull()
     }
     expect(localStorage.getItem('unrelated-preference')).toBe('keep')
@@ -193,8 +218,8 @@ describe('theme preference persistence', () => {
       render(<ThemeFixture />)
 
       expect(screen.getByLabelText('Theme mode')).toHaveTextContent('system')
-      expect(document.body).not.toHaveAttribute('data-theme-preset')
-      expect(document.body).toHaveAttribute('data-theme-font', 'system')
+      expect(document.body).toHaveAttribute('data-theme-preset', DEFAULT_PRESET)
+      expect(document.body).toHaveAttribute('data-theme-font', DEFAULT_FONT)
       expect(document.body).not.toHaveAttribute('data-theme-radius')
       expect(document.body).not.toHaveAttribute('data-theme-scale')
       expect(document.body).toHaveAttribute('data-theme-content-layout', 'full')
@@ -209,7 +234,7 @@ describe('theme preference persistence', () => {
     render(<ThemeFixture />)
 
     expect(screen.getByLabelText('Theme mode')).toHaveTextContent('system')
-    expect(document.body).not.toHaveAttribute('data-theme-preset')
+    expect(document.body).toHaveAttribute('data-theme-preset', DEFAULT_PRESET)
   })
 
   it('still applies and resets preferences when storage writes fail', async () => {
@@ -230,7 +255,7 @@ describe('theme preference persistence', () => {
     await user.click(screen.getByRole('button', { name: 'Reset' }))
 
     expect(screen.getByLabelText('Theme mode')).toHaveTextContent('system')
-    expect(document.body).not.toHaveAttribute('data-theme-preset')
+    expect(document.body).toHaveAttribute('data-theme-preset', DEFAULT_PRESET)
   })
 
   it('preserves saved theme preferences during frontend cache initialization', () => {
@@ -262,7 +287,11 @@ describe('theme font selection', () => {
     render(<ThemeFixture />)
 
     expect(document.body).toHaveAttribute('data-theme-font', 'sans')
-    expect(localStorage.getItem('newapi:theme:v1:font')).toBe('sans')
+    // Sans 已是默认字体，选中它等于默认值，因此不写存储；
+    // 重挂载后仍应为 sans，因为默认就是 sans。
+    expect(localStorage.getItem('newapi:theme:v1:font')).toBe(
+      DEFAULT_THEME_CUSTOMIZATION.font === 'sans' ? null : 'sans'
+    )
 
     await user.click(screen.getByRole('button', { name: 'Anthropic preset' }))
 
@@ -277,7 +306,10 @@ describe('theme font selection', () => {
     await user.click(screen.getByRole('button', { name: 'Auto font' }))
 
     expect(document.body).toHaveAttribute('data-theme-font', 'system')
-    expect(localStorage.getItem('newapi:theme:v1:font')).toBeNull()
+    // 默认字体是 sans 时，Auto 不再是默认值，必须显式落盘才能还原
+    expect(localStorage.getItem('newapi:theme:v1:font')).toBe(
+      DEFAULT_THEME_CUSTOMIZATION.font === 'default' ? null : 'default'
+    )
 
     first.unmount()
     render(<ThemeFixture />)
@@ -285,17 +317,20 @@ describe('theme font selection', () => {
     expect(document.body).toHaveAttribute('data-theme-font', 'system')
   })
 
-  it('uses the preset font in Auto and restores the browser font on the default preset', async () => {
+  it('uses the preset font in Auto only when the font is left at Auto', async () => {
     const user = userEvent.setup()
     render(<ThemeFixture />)
 
+    // 默认字体是显式 Sans，用户没选过 Auto，因此 Anthropic 的 serif
+    // 不会生效 —— 显式的字体选择优先级高于预设内置字体。
     await user.click(screen.getByRole('button', { name: 'Anthropic preset' }))
+    expect(document.body).toHaveAttribute('data-theme-font', 'sans')
 
+    // 切到 Auto 之后，预设字体才接管
+    await user.click(screen.getByRole('button', { name: 'Auto font' }))
     expect(document.body).toHaveAttribute('data-theme-font', 'serif')
 
     await user.click(screen.getByRole('button', { name: 'Default preset' }))
-
     expect(document.body).toHaveAttribute('data-theme-font', 'system')
-    expect(localStorage.getItem('newapi:theme:v1:font')).toBeNull()
   })
 })

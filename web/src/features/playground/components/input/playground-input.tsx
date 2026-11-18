@@ -92,11 +92,15 @@ export function PlaygroundInput({
     setText('')
   }
 
+  // 输入框用卡片色而不是画布色：它浮在内容区之上，
+  // 用 --background 会被带成比周围更暗的凹陷感，换主题时尤其明显
+  // （暖纸色底会变成米黄输入框）。用 --card 与所在面板同色，
+  // 靠 border + shadow 表达浮起感，主题无关且稳定。
   return (
     <div className='grid shrink-0 gap-4 px-1 md:pb-4'>
       <PromptInput
         className='relative'
-        groupClassName='bg-background/95 dark:bg-background/80 border-border/70 shadow-[0_18px_60px_-32px_rgba(0,0,0,0.65)] ring-1 ring-foreground/5 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-primary/45 focus-within:ring-primary/15 focus-within:shadow-[0_22px_70px_-34px_rgba(0,0,0,0.75)]'
+        groupClassName='bg-card dark:bg-card border-border/70 shadow-[0_18px_60px_-32px_rgba(0,0,0,0.65)] ring-1 ring-foreground/5 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-primary/45 focus-within:ring-primary/15 focus-within:shadow-[0_22px_70px_-34px_rgba(0,0,0,0.75)]'
         onSubmit={handleSubmit}
       >
         <PromptInputTextarea
@@ -111,7 +115,10 @@ export function PlaygroundInput({
           value={text}
         />
 
-        <PromptInputFooter className='border-border/60 bg-muted/20 dark:bg-muted/10 border-t px-3 py-2.5 backdrop-blur'>
+        {/* 底部工具栏用中性微灰而非 --muted：
+            主题的 muted 带色相（本主题是薄荷），20% 叠在白卡上会泛绿，
+            工具条看起来"脏"。中性灰在任何主题下都只是安静地把工具区压下去一档。 */}
+        <PromptInputFooter className='border-border/60 bg-neutral-500/8 dark:bg-neutral-400/10 border-t px-3 py-2.5 backdrop-blur'>
           <PlaygroundInputControls
             disabled={disabled}
             groups={groups}

@@ -94,7 +94,8 @@ export function PlaygroundInputTools({
 
   return (
     <>
-      <PromptInputTools className='bg-background/70 border-border/60 rounded-lg border p-1 shadow-xs'>
+      {/* 与输入框同色，避免在卡片上叠出一块偏暖的底 */}
+      <PromptInputTools className='bg-card border-border/60 rounded-lg border p-1 shadow-xs'>
         <Tooltip>
           <DropdownMenu>
             <TooltipTrigger

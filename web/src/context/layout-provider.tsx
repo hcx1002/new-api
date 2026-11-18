@@ -29,7 +29,9 @@ const LAYOUT_VARIANT_COOKIE_NAME = 'layout_variant'
 const LAYOUT_COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
 
 // Default values
-const DEFAULT_VARIANT = 'inset'
+// 默认用 floating：侧边栏作为独立浮层，与主内容区之间有留白和描边，
+// 页面层次比铺满的 inset 更清楚，也更贴合 Token API 主题的"卡片 + 硬边"语言。
+const DEFAULT_VARIANT = 'floating'
 const DEFAULT_COLLAPSIBLE = 'icon'
 
 type LayoutContextType = {
