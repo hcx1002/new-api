@@ -60,15 +60,29 @@ export function Turnstile({
       render()
       return
     }
+
     const scriptId = 'cf-turnstile'
-    if (document.getElementById(scriptId)) return
+    const existing = document.querySelector<HTMLScriptElement>(
+      `#${scriptId}`
+    )
+    if (existing) {
+      // 脚本已由上一个实例插入但还没加载完：轮询等它就绪，否则这里会永远不渲染
+      const timer = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(timer)
+          render()
+        }
+      }, 300)
+      return () => clearInterval(timer)
+    }
+
     const s = document.createElement('script')
     s.id = scriptId
     s.src =
       'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
     s.async = true
     s.defer = true
-    s.onload = () => render()
+    s.addEventListener('load', () => render(), { once: true })
     document.head.appendChild(s)
   }, [siteKey, onVerify, onExpire])
 

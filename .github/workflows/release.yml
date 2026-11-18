@@ -8,10 +8,8 @@ on:
       name:
         description: 'reason'
         required: false
-  push:
-    tags:
-      - '*'
-      - '!*-alpha*'
+  # 本 fork 不需要发多平台二进制 release，避免每次打 tag 触发长构建。
+  # 需要时从 Actions 页手动 run。
 
 jobs:
   linux:

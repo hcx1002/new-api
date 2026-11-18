@@ -20,13 +20,12 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { PublicLayout } from '@/components/layout'
-import { Footer } from '@/components/layout/components/footer'
 import { RichContent } from '@/components/rich-content'
 import { useTheme } from '@/context/theme-provider'
 import { isLikelyHtml } from '@/lib/content-format'
 import { useAuthStore } from '@/stores/auth-store'
+import { LandingPage } from '@/features/tokendazi/landing'
 
-import { CTA, Features, Hero, HowItWorks, Stats } from './components'
 import { useHomePageContent } from './hooks'
 
 export function Home() {
@@ -35,7 +34,7 @@ export function Home() {
   const { resolvedTheme } = useTheme()
   const { auth } = useAuthStore()
   const isAuthenticated = !!auth.user
-  const { content, isLoaded, isUrl } = useHomePageContent()
+  const { content, isUrl } = useHomePageContent()
 
   const syncIframePreferences = useCallback(() => {
     try {
@@ -57,16 +56,6 @@ export function Home() {
       syncIframePreferences()
     }
   }, [isUrl, syncIframePreferences])
-
-  if (!isLoaded) {
-    return (
-      <PublicLayout showMainContainer={false}>
-        <main className='flex min-h-screen items-center justify-center'>
-          <div className='text-muted-foreground'>{t('Loading...')}</div>
-        </main>
-      </PublicLayout>
-    )
-  }
 
   if (content) {
     if (isUrl) {
@@ -120,14 +109,5 @@ export function Home() {
     )
   }
 
-  return (
-    <PublicLayout showMainContainer={false}>
-      <Hero isAuthenticated={isAuthenticated} />
-      <Stats />
-      <Features />
-      <HowItWorks />
-      <CTA isAuthenticated={isAuthenticated} />
-      <Footer />
-    </PublicLayout>
-  )
+  return <LandingPage isAuthenticated={isAuthenticated} />
 }

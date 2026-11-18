@@ -48,6 +48,12 @@ function RootComponent() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
+  // 开发悬浮工具只在显式开启时挂载：URL 带 ?devtools=1，或 .env 设 VITE_SHOW_DEVTOOLS=true
+  const showDevtools =
+    import.meta.env.DEV &&
+    (import.meta.env.VITE_SHOW_DEVTOOLS === 'true' ||
+      new URLSearchParams(window.location.search).get('devtools') === '1')
+
   // Load system configuration (logo, system name, etc.) from backend
   useSystemConfig({ autoLoad: true })
 
@@ -97,7 +103,9 @@ function RootComponent() {
       <NavigationProgress />
       <Outlet />
       <Toaster closeButton duration={5000} position='top-center' richColors />
-      {import.meta.env.MODE === 'development' && (
+      {/* 开发悬浮工具默认收起，避免挡住页面左下/右下角。需要时：
+          ① 任意页面 URL 加 ?devtools=1；② 或在 web/.env 里写 VITE_SHOW_DEVTOOLS=true */}
+      {showDevtools && (
         <>
           <ReactQueryDevtools buttonPosition='bottom-left' />
           <TanStackRouterDevtools position='bottom-right' />

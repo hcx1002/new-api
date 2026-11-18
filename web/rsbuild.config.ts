@@ -68,7 +68,10 @@ export default defineConfig(({ envMode }) => {
     },
     server: {
       host: '0.0.0.0',
-      strictPort: false,
+      // 固定端口：rsbuild 默认也用 3000，会与后端服务抢同一个端口，
+      // 在 Windows 上两个进程可同时 bind，请求随机落到其中一个。
+      port: 5173,
+      strictPort: true,
       proxy: devProxy,
     },
     output: {

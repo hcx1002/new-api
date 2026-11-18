@@ -17,18 +17,30 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { z } from 'zod'
 
+import { sanitizeAuthRedirect } from '@/features/auth/lib/auth-redirect'
 import { SignUp } from '@/features/auth/sign-up'
+import { resolveAuthentication } from '@/lib/auth-session'
 import { useAuthStore } from '@/stores/auth-store'
+
+const searchSchema = z.object({
+  redirect: z.string().optional(),
+})
 
 export const Route = createFileRoute('/(auth)/sign-up')({
   component: SignUp,
-  beforeLoad: async () => {
-    const { auth } = useAuthStore.getState()
+  validateSearch: searchSchema,
+  beforeLoad: async ({ search }) => {
+    // 与 /sign-in 保持一致：根 guard 可能因为缺少会话提示而跳过 refresh，
+    // 这里回源确认，避免持有有效 Refresh Cookie 的用户看到注册页。
+    await resolveAuthentication()
 
-    // 如果已经有用户信息，说明已登录，注册页对其无意义，跳转到 dashboard
-    if (auth.user) {
-      throw redirect({ to: '/dashboard' })
+    if (useAuthStore.getState().auth.user) {
+      const target =
+        sanitizeAuthRedirect(search?.redirect, window.location.origin) ??
+        '/dashboard'
+      throw redirect({ href: target, replace: true })
     }
   },
 })

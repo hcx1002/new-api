@@ -75,6 +75,13 @@ export function resolveLegacyRoute(rawHref: string): string | null {
   if (pathname === '/login') {
     return buildTargetHref('/sign-in', source)
   }
+  // 早期把首页与登录页做成了独立路由 /auth?mode=login|register，
+  // 现在登录/注册已经回归 /sign-in 与 /sign-up，旧链接（含推广落地页）在这里收口。
+  if (pathname === '/auth') {
+    const mode = source.searchParams.get('mode')
+    source.searchParams.delete('mode')
+    return buildTargetHref(mode === 'register' ? '/sign-up' : '/sign-in', source)
+  }
   if (pathname === '/forbidden') {
     return buildTargetHref('/403', source)
   }

@@ -1,0 +1,343 @@
+/*
+Copyright (C) 2023-2026 QuantumNous
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+For commercial licensing, please contact support@quantumnous.com
+*/
+
+/*
+ * 通行证视觉体系（Lite Neo-Brutalism / Model Passport）
+ * 作用域限定在 .tdz-root 内，避免污染控制台的既有设计令牌。
+ */
+.tdz-root {
+  --tdz-canvas: #f8f7f4;
+  --tdz-paper: #ffffff;
+  --tdz-ink: #111316;
+  --tdz-ink-soft: #272b33;
+  --tdz-deep: #0f1412;
+  --tdz-surface-dark: #191d21;
+  --tdz-body: #525866;
+  --tdz-muted: #8a909e;
+  --tdz-emerald: #10b981;
+  --tdz-emerald-strong: #059669;
+  --tdz-shadow: #c8e3d4;
+  --tdz-shadow-deep: #b5dac6;
+  --tdz-mint: #e6f6ee;
+  --tdz-yellow: #facc15;
+  --tdz-orange: #f97316;
+  --tdz-blue: #3b82f6;
+  --tdz-line: #e4e2dd;
+
+  /* 辅助色族：徽章、提示条、代码窗口等局部点缀，同样只在本作用域内生效 */
+  --tdz-line-alt: #eae8e1;
+  --tdz-muted-alt: #8b93a1;
+  --tdz-slate: #6b7280;
+  --tdz-mint-line: #d9f1e4;
+  --tdz-mint-bright: #7ee2b8;
+  --tdz-amber-soft: #fef9c3;
+  --tdz-amber-mid: #fcd34d;
+  --tdz-amber-ink: #a16207;
+  --tdz-orange-soft: #fff7ed;
+  --tdz-orange-line: #fed7aa;
+  --tdz-orange-ink: #c2410c;
+  --tdz-blue-soft: #eff6ff;
+  --tdz-blue-line: #bfdbfe;
+  --tdz-blue-mid: #93c5fd;
+  --tdz-blue-ink: #2563eb;
+  --tdz-violet: #8b5cf6;
+  --tdz-mac-red: #ff5f56;
+  --tdz-mac-yellow: #ffbd2e;
+  --tdz-mac-green: #27c93f;
+
+  font-family:
+    'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', 'PingFang SC',
+    'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+  background-color: var(--tdz-canvas);
+  color: var(--tdz-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.tdz-root ::selection {
+  background-color: var(--tdz-mint);
+  color: var(--tdz-ink);
+}
+
+.tdz-mono {
+  font-family:
+    'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    monospace;
+  font-feature-settings:
+    'liga' 1,
+    'zero' 1;
+}
+
+/* 票据信纸底纹：28px 一条极浅横线 */
+.tdz-notebook {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 27px,
+    rgba(17, 19, 22, 0.03) 28px
+  );
+}
+
+/* 登机牌撕裂缺口 */
+.tdz-notch {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background-color: var(--tdz-canvas);
+  border: 2px solid var(--tdz-ink);
+}
+
+/* 滚动跑马灯 */
+.tdz-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 48px,
+    #000 calc(100% - 48px),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 48px,
+    #000 calc(100% - 48px),
+    transparent
+  );
+}
+
+.tdz-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: tdz-marquee 42s linear infinite;
+}
+
+.tdz-marquee:hover .tdz-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes tdz-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* 呼吸绿点 */
+@keyframes tdz-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+    opacity: 1;
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    opacity: 0.85;
+  }
+}
+
+.tdz-pulse {
+  animation: tdz-pulse 2.2s ease-out infinite;
+}
+
+/* 盖章：弹性缩放落下 */
+@keyframes tdz-stamp-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.7) rotate(-26deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-10deg);
+  }
+  78% {
+    transform: scale(1.02) rotate(-13deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-12deg);
+  }
+}
+
+.tdz-stamp-in {
+  animation: tdz-stamp-in 480ms cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+/* 校验失败：左右轻抖 */
+@keyframes tdz-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.tdz-shake {
+  animation: tdz-shake 340ms ease-in-out both;
+}
+
+/* 节点文本切换 */
+@keyframes tdz-swap {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tdz-swap {
+  animation: tdz-swap 260ms ease-out both;
+}
+
+/* 团子吉祥物悬停弹跳 */
+@keyframes tdz-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.tdz-bob {
+  animation: tdz-bob 1.8s ease-in-out infinite;
+}
+
+/* 首屏元素渐入 */
+@keyframes tdz-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tdz-rise {
+  animation: tdz-rise 620ms cubic-bezier(0.22, 0.68, 0.32, 1) both;
+}
+
+/* 终端光标 */
+@keyframes tdz-caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.tdz-caret::after {
+  content: '▌';
+  margin-left: 2px;
+  color: var(--tdz-emerald);
+  animation: tdz-caret 1s step-end infinite;
+}
+
+/* 代码区细滚动条 */
+.tdz-scroll::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.tdz-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tdz-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+}
+
+/* 表单聚焦时保留 neo-brutalist 的硬阴影 */
+.tdz-field {
+  width: 100%;
+  background-color: var(--tdz-canvas);
+  border: 2px solid var(--tdz-line);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--tdz-ink);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.tdz-field::placeholder {
+  color: var(--tdz-muted);
+  font-weight: 400;
+}
+
+.tdz-field:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: var(--tdz-ink);
+  box-shadow: 4px 4px 0 0 var(--tdz-shadow);
+}
+
+.tdz-field[data-invalid='true'] {
+  border-color: var(--tdz-orange);
+}
+
+/* 带前后置图标的字段留白 */
+.tdz-field-icon {
+  padding-left: 40px;
+}
+
+.tdz-field-action {
+  padding-right: 104px;
+}
+
+.tdz-field-eye {
+  padding-right: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tdz-marquee-track,
+  .tdz-pulse,
+  .tdz-bob,
+  .tdz-rise,
+  .tdz-swap {
+    animation: none !important;
+  }
+}

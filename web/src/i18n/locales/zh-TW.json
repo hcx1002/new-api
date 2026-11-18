@@ -2958,7 +2958,7 @@
     "footer.columns.related.links.oneApi": "One API",
     "footer.columns.related.title": "相關項目",
     "footer.defaultCopyright": "版權所有。",
-    "footer.new\u0061pi.projectAttributionSuffix": "版權所有，由項目貢獻者設計與開發。",
+    "footer.newapi.projectAttributionSuffix": "版權所有，由項目貢獻者設計與開發。",
     "For a stronger password": "讓密碼更強",
     "For advanced custom channels this applies only to /v1/responses routes without protocol conversion.": "進階自訂渠道僅對 /v1/responses 且不做協定轉換的路由生效。",
     "For channels added after May 10, 2025, no need to remove \".\" from model names during deployment": "對於 2025 年 5 月 10 日之後新增的渠道，在部署時無需從模型名稱中移除 \".\"",
@@ -7750,6 +7750,305 @@
     "Zhipu V4": "智譜 V4",
     "Zoom": "縮放",
     "By clicking sign in, you agree to our": "點擊登入即表示您同意我們的",
-    "By creating an account, you agree to our": "建立帳戶即表示您同意我們的"
+    "By creating an account, you agree to our": "建立帳戶即表示您同意我們的",
+    "mk": {
+      "common": {
+        "brandFallback": "API Gateway",
+        "close": "Close",
+        "copy": "Copy",
+        "copied": "Copied",
+        "loading": "Loading…",
+        "barcode": "Barcode {{seed}}",
+        "language": "Change language"
+      },
+      "legal": {
+        "title": {
+          "agreement": "Terms of Service",
+          "privacy": "Privacy Policy"
+        },
+        "external": "This document is configured as an external link and opens in a new tab.",
+        "open": "Open document",
+        "empty": "The administrator has not configured this document yet."
+      },
+      "nav": {
+        "home": "Home",
+        "quick": "Quick start",
+        "models": "Models",
+        "console": "Console",
+        "enterConsole": "Open console",
+        "signIn": "Sign in",
+        "signUp": "Sign up",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu"
+      },
+      "strength": {
+        "weak": "Weak",
+        "fair": "Fair",
+        "strong": "Strong",
+        "veryStrong": "Very strong",
+        "unset": "Not set"
+      },
+      "landing": {
+        "hero": {
+          "titleLine1": "{{brand}}: one key",
+          "titleLine2": "for every major model",
+          "lead": "Open models like DeepSeek-V4.1-Flash-1017 and GLM-5.3, on official upstream keys — no audit logging, billed per token, less hassle than going direct.",
+          "primary": "Get your passport",
+          "secondary": "View available lines",
+          "lines": {
+            "title": "Available lines",
+            "note": "Latency is sampled live. The model list in your console always takes precedence."
+          }
+        },
+        "marquee": {
+          "openai": "Official upstream keys",
+          "failover": "Automatic failover",
+          "uptime": "Nothing stored",
+          "clients": "Works with Cursor / Claude Code / Cline",
+          "routing": "No prompt inspection",
+          "billing": "Pay per token",
+          "onekey": "One key, every model"
+        },
+        "bento": {
+          "heading": "Why route everything through one gateway",
+          "lead": "One SDK, one key, one bill.",
+          "ticker": "Live line status",
+          "uptime": "Uptime {{value}}",
+          "models": {
+            "kicker": "Models",
+            "title": "One key, every provider",
+            "desc": "Qwen, DeepSeek, GLM, Kimi and more behind a single OpenAI-compatible endpoint, all on official upstream APIs. Switching models is a one-field change."
+          },
+          "sla": {
+            "kicker": "Reliability",
+            "title": "Automatic failover",
+            "desc": "Several upstreams stay online at once. When one wobbles, traffic moves to a backup line and your app never notices — no retry logic to write."
+          },
+          "proto": {
+            "kicker": "Protocol",
+            "title": "Drop-in OpenAI",
+            "desc": "Existing SDKs, IDE plugins and scripts keep working unchanged. Point the base URL here and leave every other parameter alone."
+          },
+          "safe": {
+            "kicker": "Privacy",
+            "title": "Official keys, nothing retained",
+            "desc": "Every upstream is a paid official API. Requests are not inspected in the path, and neither request nor response bodies are written to storage."
+          }
+        },
+        "steps": {
+          "heading": "Three steps to connect",
+          "lead": "From sign-up to your first request",
+          "side": "Already have a key? Skip to step three — the base URL is right on the home page.",
+          "key": {
+            "title": "Create an API key",
+            "desc": "After signing up, issue one yourself under Tokens in the console. Revoke it any time."
+          },
+          "base": {
+            "title": "Swap the base URL",
+            "desc": "Point your client's base_url at this site's /v1 and leave every other parameter alone."
+          },
+          "call": {
+            "title": "Send a request",
+            "desc": "Your existing OpenAI SDK code works as-is — the first call already returns a result."
+          }
+        },
+        "code": {
+          "kicker": "1-minute setup",
+          "titleLine1": "If you can use OpenAI,",
+          "titleLine2": "you can use {{brand}}.",
+          "lead": "No business logic to rewrite: swap the base URL for this site and use a model id that is actually on sale.",
+          "cta": "Get an API key",
+          "copyCode": "Copy code",
+          "run": "Simulate request (Run test)",
+          "running": "Running…",
+          "runHint": "// Press the button on the left — no key needed to try",
+          "prompt": {
+            "python": "\"Explain what an API gateway does in one sentence\"",
+            "curl": "\"Explain what an API gateway does in one sentence\"",
+            "ts": "\"Explain what an API gateway does in one sentence\"",
+            "go": "\"Explain what an API gateway does in one sentence\"",
+            "rust": "\"Explain what an API gateway does in one sentence\""
+          },
+          "simulated": "{\n  \"id\": \"chatcmpl-8f9a\",\n  \"object\": \"chat.completion.chunk\",\n  \"model\": \"qwen3.8-flash\",\n  \"choices\": [\n    {\n      \"delta\": {\n        \"content\": \"An API gateway is a single entry point that forwards each request to the right model.\"\n      }\n    }\n  ]\n}"
+        },
+        "cta": {
+          "heading": "Get your passport now",
+          "desc": "Usable right after sign-up. Pay for what you use, with no starter package to buy — and nothing you send is retained.",
+          "button": "Sign up free"
+        },
+        "footer": {
+          "tagline": "AI model gateway",
+          "attribution": "Built on New API"
+        },
+        "models": {
+          "qwen38": {
+            "note": "balanced, low latency"
+          },
+          "deepseek": {
+            "note": "strong reasoning"
+          },
+          "glm53": {
+            "note": "general purpose"
+          },
+          "kimi": {
+            "note": "long context code"
+          },
+          "qwen37": {
+            "note": "long context"
+          },
+          "glm52": {
+            "note": "cost efficient"
+          }
+        }
+      },
+      "card": {
+        "heading": "Model passport",
+        "lineStatus": "Lines healthy ({{value}})",
+        "routeTitle": "Request route",
+        "modelsReady": "{{count}} models ready",
+        "uptime": "Live uptime {{value}}",
+        "client": {
+          "title": "Your app / IDE",
+          "subtitle": "Cursor, Claude Code, scripts, services"
+        },
+        "gateway": {
+          "title": "{{brand}} gateway",
+          "subtitle": "Unified auth, smart routing, instant failover"
+        },
+        "model": {
+          "subtitle": "Current latency {{latency}}ms · {{note}}"
+        }
+      },
+      "preview": {
+        "badge": {
+          "register": "New Passport Issuing · Free",
+          "login": "Passport Verification"
+        },
+        "register": {
+          "line1": "Claim your",
+          "line2": "own",
+          "accent": "API passport",
+          "tail": "."
+        },
+        "login": {
+          "line1": "Welcome back,",
+          "line2": "the gateway is",
+          "accent": "ready",
+          "tail": "."
+        },
+        "stamp": {
+          "issued": "PASSPORT ISSUED",
+          "pending": "PENDING"
+        },
+        "tls": "TLS 1.3 in transit · keys never stored",
+        "inviteBonus": "+10% bonus credit",
+        "benefit": {
+          "models": "One key for Qwen / DeepSeek / GLM / Kimi",
+          "privacy": "Official upstream keys, nothing retained",
+          "billing": "Billed on actual token usage, balance never expires",
+          "clients": "Works with Cursor, Claude Code, Cline and more"
+        }
+      },
+      "auth": {
+        "backHome": "Back to home",
+        "gatewayOnline": "Gateway /v1 Online",
+        "oauthDivider": "OR CONTINUE WITH EMAIL",
+        "passwordDisabled": "Password sign-in is disabled on this site. Use one of the providers above to reach the console.",
+        "oauth": {
+          "loginWith": "Continue with {{provider}}"
+        },
+        "form": {
+          "login": {
+            "tab": "Sign in",
+            "submit": "Verify passport, enter console",
+            "loading": "Verifying…",
+            "successTitle": "Identity verified"
+          },
+          "register": {
+            "tab": "Register free",
+            "submit": "Create account, issue passport",
+            "loading": "Issuing…",
+            "successTitle": "Passport issued"
+          }
+        },
+        "password": {
+          "login": {
+            "label": "Password",
+            "placeholder": "Enter your password"
+          },
+          "register": {
+            "label": "Set a password",
+            "placeholder": "8–128 characters"
+          }
+        },
+        "field": {
+          "username": "Username",
+          "usernamePlaceholder": "Used to sign in, cannot be changed later",
+          "account": "Username / email",
+          "email": "Email",
+          "accountPlaceholder": "Username or email",
+          "emailPlaceholder": "name@example.com",
+          "code": "Email code",
+          "codePlaceholder": "6-digit code",
+          "forgot": "Forgot password?",
+          "showPassword": "Show password",
+          "hidePassword": "Hide password",
+          "inviteToggle": "Have an invite code?",
+          "invitePlaceholder": "Enter an invite code for extra credit",
+          "agreePrefix": "I have read and agree to the",
+          "terms": "Terms of Service",
+          "agreeAnd": "and",
+          "privacy": "Privacy Policy"
+        },
+        "sendCode": {
+          "idle": "Send code",
+          "countdown": "Resend in {{seconds}}s",
+          "sending": "Sending…"
+        },
+        "turnstile": {
+          "section": "Human check · Turnstile",
+          "reload": "Reload",
+          "failed": "The challenge widget did not load — challenges.cloudflare.com is usually blocked by the network or an extension. Hit \"Reload\" and try again.",
+          "verified": "Verified",
+          "bypass": "Dev only · timed out locally, let through",
+          "slow": "Timed out · this domain is probably not in the Site Key allowlist",
+          "pending": "Loading challenge…",
+          "blocked": "Human check failed: this domain may not be on the Cloudflare allowlist, or the token expired. Hit \"Reload\" and try again."
+        },
+        "validation": {
+          "accountRequired": "Enter your username or email",
+          "passwordRequired": "Enter your password",
+          "usernameRequired": "Enter a username",
+          "emailInvalid": "Enter a valid email address",
+          "codeRequired": "Enter the 6-digit email code",
+          "passwordLength": "Password must be 8–128 characters",
+          "agreeRequired": "Please read and accept the Terms and Privacy Policy",
+          "turnstileRequired": "Human check is not finished yet — wait a moment or tick it again",
+          "turnstileBeforeCode": "Finish the human check before requesting a code",
+          "emailBeforeCode": "Enter a valid email before requesting a code"
+        },
+        "error": {
+          "loginFailed": "Sign-in failed. Check your username and password.",
+          "registerFailed": "Sign-up failed. Please try again later.",
+          "loginRetry": "Sign-in failed. Please try again later.",
+          "registerRetry": "Sign-up failed. Please try again later."
+        },
+        "success": {
+          "registerDesc": "Account {{account}} is created. Sign in with the password you just set.",
+          "loginDesc": "Signed in. Taking you to the console…",
+          "goLogin": "Go to sign in",
+          "enterConsole": "Enter console"
+        },
+        "registerClosed": {
+          "before": "Sign-up is currently closed on this site. Existing accounts can",
+          "link": "sign in",
+          "after": "."
+        },
+        "footer": {
+          "gateway": "API Gateway",
+          "online": "All Systems Operational"
+        }
+      }
+    }
   }
 }
