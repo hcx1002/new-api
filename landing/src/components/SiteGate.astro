@@ -1,0 +1,231 @@
+---
+/**
+ * 跳转主站前的提示弹窗。
+ *
+ * 为什么需要：主站部署在 Cloudflare 隧道之后，部分地区的网络直连不通，
+ * 用户点过去只会看到一片空白，误以为站点挂了。这里统一先提示、再放行。
+ *
+ * 实现用事件委托而不是给每个链接挂 onClick：
+ * 以后新增任何指向主站的链接都会自动被拦，不需要回来改组件。
+ * 判断依据是 href 解析后的 host，不依赖具体路径。
+ */
+import { AFF_CODE, BRAND_NAME, MAIN_SITE_URL } from '@/config/site'
+
+const mainHost = new URL(MAIN_SITE_URL).host
+---
+
+<div id='site-gate' class='site-gate' hidden>
+  <div class='site-gate__mask' data-gate-cancel></div>
+  <div
+    class='site-gate__card'
+    role='dialog'
+    aria-modal='true'
+    aria-labelledby='site-gate-title'
+  >
+    <p class='site-gate__eyebrow'>即将前往</p>
+    <h2 class='site-gate__title' id='site-gate-title'>{BRAND_NAME}</h2>
+    <p class='site-gate__host' id='site-gate-host'>{mainHost}</p>
+    <p class='site-gate__note'>
+      请确保您的网络可以正常访问该站点。若页面无法打开，通常是网络环境所致，可稍后重试或更换网络。
+    </p>
+    <div class='site-gate__actions'>
+      <button type='button' class='site-gate__btn site-gate__btn--ghost' data-gate-cancel>
+        取消
+      </button>
+      <a class='site-gate__btn site-gate__btn--primary' id='site-gate-go' href='#'>
+        继续前往
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .site-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .site-gate[hidden] {
+    display: none;
+  }
+
+  .site-gate__mask {
+    position: absolute;
+    inset: 0;
+    background: rgb(17 17 17 / 45%);
+    backdrop-filter: blur(2px);
+  }
+
+  .site-gate__card {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    padding: 26px 24px 22px;
+    border: 1.5px solid var(--tdz-ink, #111);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 6px 6px 0 var(--tdz-emerald, #10b981);
+  }
+
+  .site-gate__eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tdz-ink-soft, #6b7280);
+  }
+
+  .site-gate__title {
+    margin: 0 0 10px;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--tdz-ink, #111);
+  }
+
+  .site-gate__host {
+    display: inline-block;
+    margin: 0 0 14px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--tdz-canvas, #f8f7f4);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    color: var(--tdz-body, #374151);
+    word-break: break-all;
+  }
+
+  .site-gate__note {
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--tdz-body, #374151);
+  }
+
+  .site-gate__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .site-gate__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 96px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+
+  .site-gate__btn:active {
+    transform: translateY(1px);
+  }
+
+  .site-gate__btn--ghost {
+    border: 1.5px solid var(--tdz-line, #d1d5db);
+    background: #fff;
+    color: var(--tdz-ink, #111);
+  }
+
+  .site-gate__btn--primary {
+    border: 1.5px solid var(--tdz-ink, #111);
+    background: var(--tdz-emerald, #10b981);
+    color: #fff;
+  }
+
+  @media (max-width: 420px) {
+    .site-gate__actions {
+      flex-direction: column-reverse;
+    }
+
+    .site-gate__btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<script define:vars={{ mainHost, affCode: AFF_CODE }}>
+  ;(function () {
+    var gate = document.getElementById('site-gate')
+    var goBtn = document.getElementById('site-gate-go')
+    var hostEl = document.getElementById('site-gate-host')
+    if (!gate || !goBtn) return
+
+    function close() {
+      gate.hidden = true
+      document.documentElement.style.overflow = ''
+      if (lastAnchor && lastAnchor.focus) lastAnchor.focus()
+    }
+
+    var lastAnchor = null
+
+    function open(href, blank, anchor) {
+      var url
+      try {
+        url = new URL(href, location.href)
+      } catch (err) {
+        location.href = href
+        return
+      }
+
+      // 兜底：万一有链接没走 mainSiteUrl，这里补上渠道参数
+      if (!url.searchParams.has('aff')) url.searchParams.set('aff', affCode)
+
+      lastAnchor = anchor || null
+      if (hostEl) hostEl.textContent = url.host
+      goBtn.setAttribute('href', url.href)
+      if (blank) goBtn.setAttribute('target', '_blank')
+      else goBtn.removeAttribute('target')
+
+      gate.hidden = false
+      document.documentElement.style.overflow = 'hidden'
+      goBtn.focus()
+    }
+
+    // 捕获阶段拦截：React island 的链接同样有效
+    document.addEventListener(
+      'click',
+      function (e) {
+        if (e.defaultPrevented) return
+        var anchor = e.target && e.target.closest ? e.target.closest('a[href]') : null
+        if (!anchor || anchor === goBtn) return
+        // 让用户用 cmd/ctrl/shift 或中键开新标签的行为照常进行
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+
+        var url
+        try {
+          url = new URL(anchor.href, location.href)
+        } catch (err) {
+          return
+        }
+        if (url.host !== mainHost) return
+
+        e.preventDefault()
+        open(anchor.href, anchor.target === '_blank', anchor)
+      },
+      true,
+    )
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !gate.hidden) close()
+    })
+
+    gate.addEventListener('click', function (e) {
+      var hit = e.target && e.target.closest ? e.target.closest('[data-gate-cancel]') : null
+      if (hit) close()
+    })
+  })()
+</script>

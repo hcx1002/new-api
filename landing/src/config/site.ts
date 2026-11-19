@@ -37,9 +37,20 @@ export const MAIN_SITE_PATHS = {
   privacyPolicy: '/privacy-policy',
 } as const
 
-/** 拼出主站的绝对地址。 */
+/**
+ * 跳主站时统一附带的渠道参数。
+ * 集中在这里而不是散落到各组件，避免新增链接时漏掉。
+ */
+export const AFF_CODE = 'SIoD'
+
+/**
+ * 拼出主站的绝对地址，并自动附带 aff 渠道参数。
+ * 落地站所有「去主站」的动作都必须走这里，不允许手拼 MAIN_SITE_URL。
+ */
 export function mainSiteUrl(path: keyof typeof MAIN_SITE_PATHS): string {
-  return `${MAIN_SITE_URL}${MAIN_SITE_PATHS[path]}`
+  const url = new URL(MAIN_SITE_PATHS[path], MAIN_SITE_URL)
+  url.searchParams.set('aff', AFF_CODE)
+  return url.href
 }
 
 /**

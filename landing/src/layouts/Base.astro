@@ -8,6 +8,7 @@
 import '@/styles/global.css'
 
 import { BRAND_NAME, GTM_ID, LOCALES, LOCALE_META, SITE_URL, type Locale } from '@/config/site'
+import SiteGate from '@/components/SiteGate.astro'
 
 interface Props {
   locale: Locale
@@ -140,5 +141,6 @@ const defaultJsonLd = {
       </noscript>
     )}
     <slot />
+    <SiteGate />
   </body>
 </html>
