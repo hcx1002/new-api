@@ -7,7 +7,7 @@
  */
 import '@/styles/global.css'
 
-import { BRAND_NAME, LOCALES, LOCALE_META, SITE_URL, type Locale } from '@/config/site'
+import { BRAND_NAME, GTM_ID, LOCALES, LOCALE_META, SITE_URL, type Locale } from '@/config/site'
 
 interface Props {
   locale: Locale
@@ -101,8 +101,35 @@ const defaultJsonLd = {
       type='application/ld+json'
       set:html={JSON.stringify(jsonLd ?? defaultJsonLd)}
     />
+
+    {/* Google Tag Manager：标准片段，先推 gtm.start 再异步加载容器。GTM_ID 置空即关闭 */}
+    {GTM_ID && (
+      <script define:vars={{ gtmId: GTM_ID }}>
+        (function (w, d, s, l, i) {
+          w[l] = w[l] || [];
+          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+          var f = d.getElementsByTagName(s)[0];
+          var j = d.createElement(s);
+          var dl = l != 'dataLayer' ? '&l=' + l : '';
+          j.async = true;
+          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+          f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', gtmId);
+      </script>
+    )}
   </head>
   <body>
+    {/* GTM 无 JS 兜底，必须紧跟 <body> 之后 */}
+    {GTM_ID && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+          height='0'
+          width='0'
+          style='display:none;visibility:hidden'
+        />
+      </noscript>
+    )}
     <slot />
   </body>
 </html>

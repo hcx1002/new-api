@@ -12,7 +12,7 @@ import { defineConfig } from 'astro/config'
  * 3. 站点只有一个 SEO 入口（本站），canonical 一律指向本站自身的绝对地址。
  */
 export default defineConfig({
-  site: 'https://token-api.example.com',
+  site: 'https://huancaixi.vip',
   output: 'static',
   trailingSlash: 'ignore',
   integrations: [

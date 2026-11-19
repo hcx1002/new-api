@@ -6,13 +6,22 @@
  */
 
 /** 生产落地站的规范化地址（含协议，不带结尾斜杠）。同时用于 canonical 与 sitemap。 */
-export const SITE_URL = 'https://token-api.example.com'
+export const SITE_URL = 'https://huancaixi.vip'
 
 /** 主站地址：登录、注册、控制台、法律条款都跳这里。 */
 export const MAIN_SITE_URL = 'https://hcxai.dpdns.org'
 
 /** 对外展示的品牌名。与主站 system_name 保持一致即可，但不从接口读。 */
 export const BRAND_NAME = 'Token API'
+
+/**
+ * Google Tag Manager 容器 ID。置为空字符串即完全关闭注入。
+ *
+ * 只注入落地站——主站自行 noindex，不计入统计口径，否则同一次访问会被算两次。
+ * 走标准 GTM 片段（先推 gtm.start 事件再异步加载容器），不要改成裸 <script src>，
+ * 否则容器内依赖 gtm.start 的触发器可能不触发。
+ */
+export const GTM_ID = 'GTM-PJ9MFW8S'
 
 /**
  * 主站关键路径。集中在这里，主站改路由时只需改这一处。
