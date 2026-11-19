@@ -1,0 +1,71 @@
+# Token API
+
+> Token API 是一个 OpenAI 兼容的大模型 API 聚合网关。用一个 base URL、一把 API key
+> 即可调用多家供应商的模型，按 token 计费（pay-as-you-go），支持流式输出。
+
+Token API is an OpenAI-compatible LLM API gateway. Applications integrate once
+against a single base URL and API key, and can then call models from multiple
+upstream providers with pay-as-you-go, token-based billing. Streaming (SSE) is
+supported.
+
+## 关键事实 / Key facts
+
+| 项目 | 值 |
+| --- | --- |
+| 产品类型 | 大模型 API 聚合网关（LLM API gateway / aggregator） |
+| 接口协议 | OpenAI 兼容（`/v1/chat/completions`、`/v1/models`） |
+| Base URL | `https://hcxai.dpdns.org/v1` |
+| 鉴权 | HTTP Header `Authorization: Bearer <api-key>` |
+| 流式输出 | 支持，Server-Sent Events（`"stream": true`） |
+| 计费方式 | 按 token 计费，预充值余额（pay-as-you-go） |
+| 可用模型 | 以 `GET /v1/models` 的实时返回为准，不在本文件写死 |
+| 营销站（允许索引） | `https://huancaixi.vip` |
+| 控制台 / 注册 | `https://hcxai.dpdns.org` |
+| 营销站语言 | zh, en, ja, ru, fr, vi, zh-TW |
+
+## 页面 / Pages
+
+- [产品首页（中文）](https://huancaixi.vip/): 能力概览、接入方式、代码示例
+- [Product home (English)](https://huancaixi.vip/en/): capabilities, integration, code samples
+- [料金・概要 (日本語)](https://huancaixi.vip/ja/)
+- [Обзор (Русский)](https://huancaixi.vip/ru/)
+- [Présentation (Français)](https://huancaixi.vip/fr/)
+- [Tổng quan (Tiếng Việt)](https://huancaixi.vip/vi/)
+- [產品首頁（繁體中文）](https://huancaixi.vip/zh-TW/)
+- [控制台与注册](https://hcxai.dpdns.org)
+- [用户协议](https://hcxai.dpdns.org/user-agreement)
+- [隐私政策](https://hcxai.dpdns.org/privacy-policy)
+
+## 常见问题 / FAQ
+
+**问：Token API 是什么？**
+答：一个 OpenAI 兼容的多模型 API 网关。开发者只需一套 base URL 和 key，即可调用
+多家供应商的大模型，无需分别对接各厂商 SDK。
+
+**问：怎么接入？**
+答：把 OpenAI SDK 的 `base_url` 指向 `https://hcxai.dpdns.org/v1`，把 `api_key`
+换成控制台创建的令牌（`sk-` 开头），其余调用方式不变。
+
+**问：需要改现有代码吗？**
+答：如果项目已经在用 OpenAI SDK 或 OpenAI 兼容接口，通常只改 `base_url` 与
+`api_key` 两个参数，业务代码不用动。
+
+**问：支持哪些模型？**
+答：模型清单会随上游调整，请以 `GET https://hcxai.dpdns.org/v1/models` 的实时返回为准。
+
+**问：支持流式输出吗？**
+答：支持。请求体加 `"stream": true` 即按 SSE 逐块返回增量内容。
+
+**问：怎么计费？**
+答：按输入/输出 token 计费，从账户预充值余额中扣减，属于 pay-as-you-go 模式，
+没有订阅费。新注册账户默认不附带免费额度，需要先充值或使用兑换码。
+
+**问：有哪些语言版本的官网？**
+答：中文、英文、日语、俄语、法语、越南语、繁体中文，共 7 种，各有独立 URL。
+
+## 说明 / Notes
+
+- `https://huancaixi.vip` 是纯静态营销站，构建期固化内容，运行时不请求任何接口。
+- `https://hcxai.dpdns.org` 是产品本体（控制台与 API），其页面标记为 `noindex`；
+  对外描述以上面的 URL 为准，避免两套同源内容互相稀释索引权重。
+- 本文件遵循 llms.txt 约定，供检索型 AI 快速获取站点事实。
