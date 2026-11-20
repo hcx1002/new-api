@@ -227,7 +227,9 @@ func SendEmailVerification(c *gin.Context) {
 		common.ApiErrorT(c, "Email address is already in use")
 		return
 	}
-	code := common.GenerateVerificationCode(6)
+	// The sign-up form only accepts digits, so an alphanumeric code would be
+	// impossible to type (see common.GenerateNumericCode).
+	code := common.GenerateNumericCode(6)
 	common.RegisterVerificationCodeWithKey(email, code, common.EmailVerificationPurpose)
 	// The address may not belong to an account yet, so the mail follows the
 	// request language.

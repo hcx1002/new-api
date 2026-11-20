@@ -1,6 +1,8 @@
 package common
 
 import (
+	"crypto/rand"
+	"math/big"
 	"strings"
 	"sync"
 	"time"
@@ -30,6 +32,33 @@ func GenerateVerificationCode(length int) string {
 		return code
 	}
 	return code[:length]
+}
+
+// GenerateNumericCode returns a random code made only of digits.
+//
+// The console treats email verification codes as digits: the sign-up form
+// strips every non-digit character as it is typed and validates the field with
+// /^\d{6}$/ before submitting (the same rule guards the email-binding dialog).
+// GenerateVerificationCode returns a UUID prefix, which is hexadecimal, so a
+// code containing a-f can never be entered. Email verification therefore always
+// fails once the random code happens to include a letter.
+func GenerateNumericCode(length int) string {
+	if length <= 0 {
+		return ""
+	}
+	digits := make([]byte, length)
+	ten := big.NewInt(10)
+	for i := range digits {
+		n, err := rand.Int(rand.Reader, ten)
+		if err != nil {
+			// crypto/rand is not expected to fail on supported platforms. Should it
+			// happen, fall back to a time-derived digit instead of a fixed value.
+			digits[i] = byte('0' + (time.Now().UnixNano()>>uint(i*3))%10)
+			continue
+		}
+		digits[i] = byte('0' + n.Int64())
+	}
+	return string(digits)
 }
 
 func RegisterVerificationCodeWithKey(key string, code string, purpose string) {
